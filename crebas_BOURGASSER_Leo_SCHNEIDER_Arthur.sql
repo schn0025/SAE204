@@ -35,13 +35,13 @@ create table EVENEMENT
 (
    cdPers               INTEGER              not null,
    numEv                INTEGER              not null,
-   dateDebEv            DATE,
+   dateDebEv            DATE                 not null,
    dateFinEv            DATE,
    nbPlaces             INTEGER,
    tarif                FLOAT,
    constraint PK_EVENEMENT primary key (cdPers, numEv),
-   constraint Contrainte_mini_nbPlace check (nbPlaces >= 20
-)
+   constraint Contrainte_mini_nbPlace check (nbPlaces >= 20),
+   constraint CK_dateFinEv check (dateFinEv >= dateDebEv)
 );
 
 /*==============================================================*/
