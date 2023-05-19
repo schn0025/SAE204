@@ -28,6 +28,10 @@ drop table TERRITOIRE cascade constraints;
 
 drop table THEME cascade constraints;
 
+drop table ACTIVITE cascade constraints;
+
+drop table PROGRAMME cascade constraints;
+
 /*==============================================================*/
 /* Table : PARTICIPANT                                          */
 /*==============================================================*/
@@ -41,6 +45,7 @@ create table PARTICIPANT
    villePers            VARCHAR2(100),
    telPers              CHAR(10),
    tpPers               CHAR(1),
+   dateNais             DATE,
    constraint PK_PARTICIPANT primary key (cdPers),
    constraint Contrainte_tpPers check (UPPER(tpPers) IN ('P', 'C', 'E')
 )
@@ -57,11 +62,13 @@ create table EVENEMENT
    dateFinEv            DATE,
    nbPlaces             INTEGER,
    tarif                FLOAT,
+   dureeEv              GENERATED ALWAYS AS (dateFinEv - dateDebEv) VIRTUAL,
    constraint PK_EVENEMENT primary key (cdPers, numEv),
    constraint Contrainte_mini_nbPlace check (nbPlaces >= 20),
    constraint CK_dateFinEv check (dateFinEv >= dateDebEv),
    constraint FK_EVENEMEN_PARTICIPE_PARTICIP foreign key (cdPers)
       references PARTICIPANT (cdPers)
+      ON DELETE CASCADE
 );
 
 /*==============================================================*/
@@ -102,7 +109,8 @@ create table SITE
    siteweb              VARCHAR2(100),
    constraint PK_SITE primary key (cdSite),
    constraint FK_SITE_CORRESPON_THEME foreign key (cdTheme)
-      references THEME (cdTheme),
+      references THEME (cdTheme)
+      ON DELETE CASCADE,
    constraint FK_SITE_APPARTENI_TERRITOI foreign key (cdTerr)
       references TERRITOIRE (cdTerr)
 );
@@ -122,11 +130,50 @@ create table RESERVATION
    constraint PK_RESERVATION primary key (cdPers, EVE_cdPers, numEv, cdSite, dateResa),
    constraint Contrainte_modeReglt check (modeReglt BETWEEN 1 and 3),
    constraint FK_RESERVAT_RESERVER_PARTICIP foreign key (cdPers)
-      references PARTICIPANT (cdPers),
+      references PARTICIPANT (cdPers)
+      ON DELETE CASCADE,
    constraint FK_RESERVAT_CONSERNER_SITE foreign key (cdSite)
-      references SITE (cdSite),
+      references SITE (cdSite)
+      ON DELETE CASCADE,
    constraint FK_RESERVAT_COINCIDER_EVENEMEN foreign key (EVE_cdPers, numEv)
       references EVENEMENT (cdPers, numEv)
+      ON DELETE CASCADE
 );
 
+/*==============================================================*/
+/* Table : ACTIVITE                                             */
+/*==============================================================*/
+CREATE TABLE ACTIVITE
+(
+    cdAct   CHAR(1) PRIMARY KEY not null,
+    nomAct  VARCHAR(100)
+);
 
+INSERT  INTO ACTIVITE
+    SELECT  *
+    FROM    TESTSAELD.ACTIVITE;
+
+/*==============================================================*/
+/* Table : PROGRAMME                                            */
+/*==============================================================*/
+CREATE TABLE PROGRAMME
+(
+    cdAct       CHAR(1) not null,
+    cdSite      INTEGER not null,
+    tpPublic    VARCHAR(4),
+    constraint PK_PROGRAMME primary key (cdAct, cdSite),
+    constraint FK_cdAct foreign key (cdAct)
+      references ACTIVITE (cdAct)
+      ON DELETE CASCADE,
+    constraint FK_cdSite foreign key (cdSite)
+      references SITE (cdSite)
+      ON DELETE CASCADE,
+    constraint CK_tpPublic check (UPPER(tpPublic) IN ('TOUS', '+18', '+10', '+5'))
+);
+
+CREATE INDEX fk_cdTerr  ON SITE (cdTerr);
+CREATE INDEX fk_cdTheme ON SITE (cdTheme);
+CREATE INDEX nomSite    ON SITE (nomSite);
+CREATE INDEX nomPers    ON PARTICIPANT (nomPers);
+CREATE INDEX prenomPers ON PARTICIPANT (prenomPers);
+CREATE INDEX nomAct     ON ACTIVITE (nomACT);
