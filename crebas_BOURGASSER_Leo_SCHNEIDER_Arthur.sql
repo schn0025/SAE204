@@ -289,3 +289,21 @@ INSERT INTO EVENEMENT(cdSite,numEv,dateDebEv,dateFinEv,nbPlaces,tarif)
     FROM    TESTSAELD.EVENEMENT
     WHERE   cdSite IN   (SELECT cdSite
                         FROM    SITE);
+                        
+/*==============================================================*/
+/* Insertions : Reservation                                     */
+/*==============================================================*/
+INSERT INTO RESERVATION(cdPers,numEv,cdSite,dateResa,nbPlResa,modeReglt)
+    SELECT  cdPers,
+            numEv,
+            cdSite,
+            dateInscr,
+            nbPlResa,
+            modeReglt
+    FROM    TESTSAELD.INSCRIPTION
+    WHERE   cdSite IN   (SELECT cdSite
+                        FROM    SITE)
+      AND   cdPers IN   (SELECT cdPers
+                        FROM    PARTICIPANT)
+      AND   numEv IN   (SELECT numEv
+                        FROM    EVENEMENT);
