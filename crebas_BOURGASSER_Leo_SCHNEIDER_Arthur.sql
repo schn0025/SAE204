@@ -54,26 +54,6 @@ create table PARTICIPANT
 );
 
 /*==============================================================*/
-/* Table : EVENEMENT                                            */
-/*==============================================================*/
-create table EVENEMENT 
-(
-   cdPers               INTEGER              not null,
-   numEv                INTEGER              not null,
-   dateDebEv            DATE                 not null,
-   dateFinEv            DATE,
-   nbPlaces             INTEGER,
-   tarif                FLOAT,
-   dureeEv              GENERATED ALWAYS AS (dateFinEv - dateDebEv) VIRTUAL,
-   constraint PK_EVENEMENT primary key (cdPers, numEv),
-   constraint Contrainte_mini_nbPlace check (nbPlaces >= 20),
-   constraint CK_dateFinEv check (dateFinEv >= dateDebEv),
-   constraint FK_EVENEMEN_PARTICIPE_PARTICIP foreign key (cdPers)
-      references PARTICIPANT (cdPers)
-      ON DELETE CASCADE
-);
-
-/*==============================================================*/
 /* Table : TERRITOIRE                                           */
 /*==============================================================*/
 create table TERRITOIRE 
@@ -118,18 +98,37 @@ create table SITE
 );
 
 /*==============================================================*/
+/* Table : EVENEMENT                                            */
+/*==============================================================*/
+create table EVENEMENT 
+(
+   cdSite               INTEGER              not null,
+   numEv                INTEGER              not null,
+   dateDebEv            DATE                 not null,
+   dateFinEv            DATE,
+   nbPlaces             INTEGER,
+   tarif                FLOAT,
+   dureeEv              GENERATED ALWAYS AS (dateFinEv - dateDebEv) VIRTUAL,
+   constraint PK_EVENEMENT primary key (cdSite, numEv),
+   constraint Contrainte_mini_nbPlace check (nbPlaces >= 20),
+   constraint CK_dateFinEv check (dateFinEv >= dateDebEv),
+   constraint FK_EVENEMEN_PARTICIPE_PARTICIP foreign key (cdSite)
+      references SITE (cdSite)
+      ON DELETE CASCADE
+);
+
+/*==============================================================*/
 /* Table : RESERVATION                                          */
 /*==============================================================*/
 create table RESERVATION 
 (
    cdPers               INTEGER              not null,
-   EVE_cdPers           INTEGER              not null,
    numEv                INTEGER              not null,
    cdSite               INTEGER              not null,
    dateResa             DATE                 not null,
    nbPlResa             INTEGER,
    modeReglt            INTEGER,
-   constraint PK_RESERVATION primary key (cdPers, EVE_cdPers, numEv, cdSite, dateResa),
+   constraint PK_RESERVATION primary key (cdPers, numEv, cdSite, dateResa),
    constraint Contrainte_modeReglt check (modeReglt BETWEEN 1 and 3),
    constraint FK_RESERVAT_RESERVER_PARTICIP foreign key (cdPers)
       references PARTICIPANT (cdPers)
@@ -137,8 +136,8 @@ create table RESERVATION
    constraint FK_RESERVAT_CONSERNER_SITE foreign key (cdSite)
       references SITE (cdSite)
       ON DELETE CASCADE,
-   constraint FK_RESERVAT_COINCIDER_EVENEMEN foreign key (EVE_cdPers, numEv)
-      references EVENEMENT (cdPers, numEv)
+   constraint FK_RESERVAT_COINCIDER_EVENEMEN foreign key (cdSite, numEv)
+      references EVENEMENT (cdSite, numEv)
       ON DELETE CASCADE
 );
 
@@ -258,3 +257,35 @@ INSERT INTO PARTICIPANT(cdPers, nomPers, prenomPers, adrPers, cpPers, villePers,
             NULL, 
             'P'
     FROM    TESTS1.CLIENT;
+    
+/*==============================================================*/
+/* Insertions : Site                                            */
+/*==============================================================*/
+INSERT INTO SITE
+    SELECT  cdSite,
+            cdTerr,
+            cdTheme,
+            nomSite,
+            tpSite,
+            adrSite,
+            cpSite,
+            villeSite,
+            emailSite,
+            REPLACE(telSite, ' ', ''),
+            siteWeb
+    FROM    TESTSAELD.SITE
+    WHERE   cdTerr BETWEEN 1 AND 3;
+    
+/*==============================================================*/
+/* Insertions : Evenement                                       */
+/*==============================================================*/
+INSERT INTO EVENEMENT(cdSite,numEv,dateDebEv,dateFinEv,nbPlaces,tarif)
+    SELECT  cdSite,
+            numEv,
+            dateDebEv,
+            dateFinEv,
+            nbPlaces,
+            tarif
+    FROM    TESTSAELD.EVENEMENT
+    WHERE   cdSite IN   (SELECT cdSite
+                        FROM    SITE);
