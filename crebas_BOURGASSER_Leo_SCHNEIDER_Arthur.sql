@@ -32,6 +32,8 @@ drop table ACTIVITE cascade constraints;
 
 drop table PROGRAMME cascade constraints;
 
+DROP SEQUENCE PK_PARTICIPANT;
+
 /*==============================================================*/
 /* Table : PARTICIPANT                                          */
 /*==============================================================*/
@@ -228,3 +230,31 @@ VALUES(2, 'Vallées ' || '&' || ' Marais');
 
 INSERT INTO TERRITOIRE
 VALUES(3, 'Côte d''opale');
+
+/*==============================================================*/
+/* Insertions : Participant                                     */
+/*==============================================================*/
+CREATE SEQUENCE PK_PARTICIPANT
+START WITH 1;
+
+INSERT INTO PARTICIPANT(cdPers, nomPers, prenomPers, adrPers, cpPers, villePers, telPers, tpPers)
+    SELECT  PK_PARTICIPANT.NEXTVAL, 
+            nomPers, 
+            prenomPers, 
+            adrPers, 
+            cpPers, 
+            villePers, 
+            REPLACE(telPers, '.', ''), 
+            tpPers
+    FROM    TESTS1.EMPRUNTEUR;
+    
+INSERT INTO PARTICIPANT(cdPers, nomPers, prenomPers, adrPers, cpPers, villePers, telPers, tpPers)
+    SELECT  PK_PARTICIPANT.NEXTVAL, 
+            nom, 
+            prnm, 
+            adr, 
+            cp, 
+            localite, 
+            NULL, 
+            'P'
+    FROM    TESTS1.CLIENT;
