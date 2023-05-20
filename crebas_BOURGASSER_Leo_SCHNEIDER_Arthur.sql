@@ -171,9 +171,60 @@ CREATE TABLE PROGRAMME
     constraint CK_tpPublic check (UPPER(tpPublic) IN ('TOUS', '+18', '+10', '+5'))
 );
 
+/*==============================================================*/
+/* Création des index                                           */
+/*==============================================================*/
 CREATE INDEX fk_cdTerr  ON SITE (cdTerr);
 CREATE INDEX fk_cdTheme ON SITE (cdTheme);
 CREATE INDEX nomSite    ON SITE (nomSite);
 CREATE INDEX nomPers    ON PARTICIPANT (nomPers);
 CREATE INDEX prenomPers ON PARTICIPANT (prenomPers);
 CREATE INDEX nomAct     ON ACTIVITE (nomACT);
+
+/*==============================================================*/
+/* Insertions : Theme                                           */
+/*==============================================================*/
+INSERT INTO THEME
+VALUES(1, 'Animaux');
+
+INSERT INTO THEME
+VALUES(2, 'Sport');
+
+INSERT INTO THEME
+VALUES(3, 'Bateaux');
+
+INSERT INTO THEME
+VALUES(4, 'Ferme pédagogique');
+
+INSERT INTO THEME
+VALUES(5, 'Parcs et jardins');
+
+INSERT INTO THEME
+VALUES(6, 'Jeux pour enfants');
+
+INSERT INTO THEME
+VALUES(7, 'Patrimoine');
+
+INSERT INTO THEME
+VALUES(8, 'Parcours Sportifs');
+
+INSERT INTO THEME
+VALUES(9, 'Golf');
+
+INSERT INTO THEME
+VALUES(10, 'Sports nautiques');
+
+INSERT INTO THEME
+VALUES(11, 'Parc d''attraction');
+
+/*==============================================================*/
+/* Insertions : Territoire                                      */
+/*==============================================================*/
+INSERT INTO TERRITOIRE
+VALUES(1, 'Autour du Louvres - Lens');
+
+INSERT INTO TERRITOIRE
+VALUES(2, 'Vallées ' || '&' || ' Marais');
+
+INSERT INTO TERRITOIRE
+VALUES(3, 'Côte d''opale');
