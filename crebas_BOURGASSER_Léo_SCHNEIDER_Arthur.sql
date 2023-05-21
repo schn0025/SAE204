@@ -279,13 +279,14 @@ INSERT INTO SITE
 /*==============================================================*/
 /* Insertions : Evenement                                       */
 /*==============================================================*/
-INSERT INTO EVENEMENT(cdSite,numEv,dateDebEv,dateFinEv,nbPlaces,tarif)
+INSERT INTO EVENEMENT(cdSite,numEv,dateDebEv,dateFinEv,nbPlaces,tarif,nomEv)
     SELECT  cdSite,
             numEv,
             dateDebEv,
             dateFinEv,
             nbPlaces,
-            tarif
+            tarif,
+            nomEv
     FROM    TESTSAELD.EVENEMENT
     WHERE   cdSite IN   (SELECT cdSite
                         FROM    SITE);
@@ -307,3 +308,9 @@ INSERT INTO RESERVATION(cdPers,numEv,cdSite,dateResa,nbPlResa,modeReglt)
                         FROM    PARTICIPANT)
       AND   numEv IN   (SELECT numEv
                         FROM    EVENEMENT);
+                        
+/*==============================================================*/
+/* Correction de dernières minutes                              */
+/*==============================================================*/
+ALTER TABLE EVENEMENT
+ADD nomEv VARCHAR(100);
